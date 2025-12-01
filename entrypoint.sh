@@ -1,9 +1,18 @@
 #!/bin/bash
-echo "Running clang-tidy with std-prefix plugin..."
+set -e
 
+echo "Running clang-tidy with std-prefix plugin..."
 cd /github/workspace
 
-CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep -E "\.(c|cc|cpp|h|hpp)$" || true)
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+    echo "Pull request detected."
+    BASE_SHA="$GITHUB_BASE_SHA"
+    HEAD_SHA="$GITHUB_HEAD_SHA"
+    CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -E "\.(c|cc|cpp|h|hpp)$" || true)
+else
+    echo "Push or other event detected."
+    CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | grep -E "\.(c|cc|cpp|h|hpp)$" || true)
+fi
 
 if [ -z "$CHANGED_FILES" ]; then
     echo "No changed source files. Nothing to analyze."
@@ -13,7 +22,6 @@ fi
 echo "Files to check:"
 echo "$CHANGED_FILES"
 
-# 2) Run clang-tidy on each changed file
 EXIT_CODE=0
 
 for FILE in $CHANGED_FILES; do
@@ -21,7 +29,7 @@ for FILE in $CHANGED_FILES; do
     echo "Checking: $FILE"
     echo "---------------------------------------------------------"
 
-    clang-tidy-18 \
+    clang-tidy \
         -load=/usr/local/lib/libclangTidyStdPrefixPlugin.so \
         -checks=-*,std-prefix-fixed-int \
         "$FILE" -- -std=c++17 || EXIT_CODE=$?

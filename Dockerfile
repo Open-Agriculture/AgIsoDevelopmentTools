@@ -5,6 +5,7 @@ RUN apt-get update && \
         llvm-18-dev \
         clang-18 \
         libclang-18-dev \
+        clang-tidy \
         cmake make g++ git
 
 

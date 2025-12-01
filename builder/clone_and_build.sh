@@ -8,7 +8,7 @@ echo "Building clang-tidy-std-prefix plugin..."
 cd /src/clang-tidy-std-prefix
 
 cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --target clangTidyStdPrefix
+cmake --build build --target clangTidyStdPrefixPlugin
 
 # Move the .so to system location
 cp build/*.so /usr/local/lib/

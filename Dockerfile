@@ -17,6 +17,4 @@ RUN chmod +x /builder.sh && /builder.sh
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-RUN git config --global --add safe.directory /github/workspace
-
 ENTRYPOINT ["/entrypoint.sh"]

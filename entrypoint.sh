@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+git config --global --add safe.directory /github/workspace
+
 echo "Running clang-tidy with std-prefix plugin..."
 cd /github/workspace
 

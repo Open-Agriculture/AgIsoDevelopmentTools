@@ -1,0 +1,12 @@
+name: "AgIsoDevelopmentChecks"
+description: "Custom clang-tidy checks to enforce coding standards utilized for the Open-Agriculture project"
+author: "Miklos Marton"
+
+inputs:
+  path:
+    description: "source"
+    default: "."
+
+runs:
+  using: "docker"
+  image: "Dockerfile"

@@ -8,7 +8,6 @@ RUN apt-get update && \
         clang-tidy \
         cmake make g++ git
 
-
 # Clone and build plugin
 COPY builder/clone_and_build.sh /builder.sh
 RUN chmod +x /builder.sh && /builder.sh

@@ -4,15 +4,34 @@ set -e
 echo "Running clang-tidy with std-prefix plugin..."
 cd /github/workspace
 
+#
+# Determine changed files
+#
+
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     echo "Pull request detected."
-    BASE_SHA="$GITHUB_BASE_SHA"
-    HEAD_SHA="$GITHUB_HEAD_SHA"
+
+    # Extract SHAs from the event JSON
+    BASE_SHA=$(jq -r '.pull_request.base.sha' "$GITHUB_EVENT_PATH")
+    HEAD_SHA=$(jq -r '.pull_request.head.sha' "$GITHUB_EVENT_PATH")
+
+    echo "Base SHA: $BASE_SHA"
+    echo "Head SHA: $HEAD_SHA"
+
     CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -E "\.(c|cc|cpp|h|hpp)$" || true)
+
 else
     echo "Push or other event detected."
-    CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | grep -E "\.(c|cc|cpp|h|hpp)$" || true)
+
+    # Fallback for branch builds (HEAD^ must exist)
+    if git rev-parse HEAD^ >/dev/null 2>&1; then
+        CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | grep -E "\.(c|cc|cpp|h|hpp)$" || true)
+    else
+        echo "No parent commit. Probably initial push — nothing to analyze."
+        exit 0
+    fi
 fi
+
 
 if [ -z "$CHANGED_FILES" ]; then
     echo "No changed source files. Nothing to analyze."

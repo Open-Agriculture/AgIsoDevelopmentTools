@@ -6,7 +6,8 @@ RUN apt-get update && \
         clang-18 \
         libclang-18-dev \
         clang-tidy \
-        cmake make g++ git
+        cmake make g++ git \
+        jq
 
 # Clone and build plugin
 COPY builder/clone_and_build.sh /builder.sh

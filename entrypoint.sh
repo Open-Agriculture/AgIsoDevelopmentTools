@@ -5,12 +5,6 @@ git config --global --add safe.directory /github/workspace
 
 cd /github/workspace
 
-mkdir build
-
-echo "Generating "
-
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1
-
 echo "Running clang-tidy with std-prefix plugin..."
 
 

@@ -7,7 +7,6 @@ RUN apt-get update && \
         libclang-18-dev \
         clang-tidy \
         cmake make g++ git \
-        pkg-config \
         jq
 
 # Clone and build plugin

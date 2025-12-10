@@ -6,6 +6,10 @@ git config --global --add safe.directory /github/workspace
 echo "Running clang-tidy with std-prefix plugin..."
 cd /github/workspace
 
+mkdir build
+
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     echo "Pull request detected."
 
@@ -49,10 +53,7 @@ for FILE in $CHANGED_FILES; do
     echo "Checking: $FILE"
     echo "---------------------------------------------------------"
 
-    clang-tidy \
-        -load=/usr/local/lib/libclangTidyStdPrefixPlugin.so \
-        -checks=-*,std-prefix-fixed-int \
-        "$FILE" -- -std=c++17 || EXIT_CODE=$?
+    clang-tidy -load=/usr/local/lib/libclangTidyStdPrefixPlugin.so -checks=-*,std-prefix-fixed-int -g build/compile_commands.json "$FILE" || EXIT_CODE=$?
 done
 
 exit $EXIT_CODE

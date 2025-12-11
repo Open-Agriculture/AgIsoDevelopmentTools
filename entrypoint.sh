@@ -3,6 +3,20 @@ set -e
 
 BUILD_DIR="${GITHUB_WORKSPACE}/build"
 
+# --- FIX: rewrite compile_commands.json absolute paths ---
+HOST_DIR=$(jq -r '.[0].directory' "$BUILD_DIR/compile_commands.json")
+
+if [ -z "$HOST_DIR" ]; then
+    echo "ERROR: Could not read compile_commands.json directory field."
+    exit 1
+fi
+
+echo "Normalizing compile_commands.json paths:"
+echo "  HOST_DIR → $HOST_DIR"
+echo "  BUILD_DIR → $BUILD_DIR"
+
+sed -i "s|$HOST_DIR|$BUILD_DIR|g" "$BUILD_DIR/compile_commands.json"
+
 if [ ! -d "$BUILD_DIR" ]; then
     echo "ERROR: Build directory not found: $BUILD_DIR"
     ls -al "$GITHUB_WORKSPACE"
@@ -13,8 +27,7 @@ git config --global --add safe.directory ${GITHUB_WORKSPACE}
 
 cd ${GITHUB_WORKSPACE}
 
-echo "Normalizing compile_commands.json paths..."
-sed -i "s|${GITHUB_WORKSPACE%/*/*}|$GITHUB_WORKSPACE|g" "$BUILD_DIR/compile_commands.json"
+HOST_DIR=$(jq -r '.[0].directory' "$BUILD_DIR/compile_commands.json")
 
 echo "Running clang-tidy with std-prefix plugin..."
 

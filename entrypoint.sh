@@ -1,9 +1,17 @@
 #!/bin/bash
 set -e
 
-git config --global --add safe.directory /github/workspace
+BUILD_DIR="${GITHUB_WORKSPACE}/build"
 
-cd /github/workspace
+if [ ! -d "$BUILD_DIR" ]; then
+    echo "ERROR: Build directory not found: $BUILD_DIR"
+    ls -al "$GITHUB_WORKSPACE"
+    exit 1
+fi
+
+git config --global --add safe.directory ${GITHUB_WORKSPACE}
+
+cd ${GITHUB_WORKSPACE}
 
 echo "Running clang-tidy with std-prefix plugin..."
 
@@ -51,7 +59,7 @@ for FILE in $CHANGED_FILES; do
     echo "Checking: $FILE"
     echo "---------------------------------------------------------"
 
-    clang-tidy -load=/usr/local/lib/libclangTidyStdPrefixPlugin.so -checks=-*,std-prefix-fixed-int -p build/compile_commands.json "$FILE" || EXIT_CODE=$?
+    clang-tidy -load=/usr/local/lib/libclangTidyStdPrefixPlugin.so -checks=-*,std-prefix-fixed-int -p "$BUILD_DIR/compile_commands.json" "$FILE" || EXIT_CODE=$?
 done
 
 exit $EXIT_CODE

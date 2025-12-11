@@ -59,7 +59,7 @@ for FILE in $CHANGED_FILES; do
     echo "Checking: $FILE"
     echo "---------------------------------------------------------"
 
-    clang-tidy -load=/usr/local/lib/libclangTidyStdPrefixPlugin.so -checks=-*,std-prefix-fixed-int -p "$BUILD_DIR/compile_commands.json" "$FILE" || EXIT_CODE=$?
+    clang-tidy -load=/usr/local/lib/libclangTidyStdPrefixPlugin.so -checks=-*,std-prefix-fixed-int -p "$BUILD_DIR" "$FILE" || EXIT_CODE=$?
 done
 
 exit $EXIT_CODE

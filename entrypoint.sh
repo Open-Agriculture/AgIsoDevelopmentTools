@@ -13,6 +13,9 @@ git config --global --add safe.directory ${GITHUB_WORKSPACE}
 
 cd ${GITHUB_WORKSPACE}
 
+echo "Normalizing compile_commands.json paths..."
+sed -i "s|${GITHUB_WORKSPACE%/*/*}|$GITHUB_WORKSPACE|g" "$BUILD_DIR/compile_commands.json"
+
 echo "Running clang-tidy with std-prefix plugin..."
 
 

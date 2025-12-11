@@ -15,7 +15,11 @@ echo "Normalizing compile_commands.json paths:"
 echo "  HOST_DIR → $HOST_DIR"
 echo "  BUILD_DIR → $BUILD_DIR"
 
+cat /github/workspace/build/compile_commands.json
+
 sed -i "s|$HOST_DIR|$BUILD_DIR|g" "$BUILD_DIR/compile_commands.json"
+
+cat /github/workspace/build/compile_commands.json
 
 if [ ! -d "$BUILD_DIR" ]; then
     echo "ERROR: Build directory not found: $BUILD_DIR"

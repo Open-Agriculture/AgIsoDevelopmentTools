@@ -12,4 +12,7 @@ RUN apt-get update && \
 COPY builder/clone_and_build.sh /builder.sh
 RUN chmod +x /builder.sh && /builder.sh
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT ["/entrypoint.sh"]

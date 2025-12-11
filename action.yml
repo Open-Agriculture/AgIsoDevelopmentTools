@@ -1,12 +1,32 @@
-name: "AgIsoDevelopmentChecks"
-description: "Custom clang-tidy checks to enforce coding standards utilized for the Open-Agriculture project"
-author: "Miklos Marton"
-
-inputs:
-  path:
-    description: "source"
-    default: "."
-
+name: "Install clang-tidy plugin"
+description: "Build and install clang-tidy plugin to the host runner"
 runs:
-  using: "docker"
-  image: "Dockerfile"
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y llvm-18-dev clang-18 libclang-18-dev cmake make g++ git
+    - name: Determine calling version
+      shell: bash
+      run: |
+        cd "$GITHUB_ACTION_PATH"
+        TAG=$(git describe --tags --exact-match 2>/dev/null || git rev-parse HEAD)
+        echo "PLUGIN_REF=$TAG" >> $GITHUB_ENV
+
+    - name: Clone plugin repository
+      shell: bash
+      run: |
+        echo "Cloning plugin at ref $PLUGIN_REF"
+        git clone --branch "$PLUGIN_REF" --depth 1 https://github.com/Open-Agriculture/AgIsoDevelopmentTools.git
+        cd AgIsoDevelopmentTools
+        git checkout "$PLUGIN_REF"
+        cd clang-tidy-std-prefix
+        cmake -B build
+        cmake --build build
+
+    - name: Install plugin to host
+      shell: bash
+      run: |
+        sudo cp clang-tidy-std-prefix/build/libclangTidyStdPrefixPlugin.so /usr/local/lib/

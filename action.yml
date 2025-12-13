@@ -1,5 +1,6 @@
 name: "Install clang-tidy plugin"
 description: "Build and install clang-tidy plugin to the host runner"
+
 runs:
   using: "composite"
   steps:
@@ -7,25 +8,20 @@ runs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y llvm-18-dev clang-18 libclang-18-dev cmake make g++ git
+        sudo apt-get install -y \
+          llvm-18-dev clang-18 libclang-18-dev \
+          cmake make g++ git
 
-    - name: Determine plugin ref
+    - name: Build clang-tidy plugin
       shell: bash
       run: |
-        echo "PLUGIN_REF=${GITHUB_ACTION_REF}" >> $GITHUB_ENV
-
-    - name: Clone plugin repository
-      shell: bash
-      run: |
-        echo "Cloning plugin at ref $PLUGIN_REF"
-        git clone --branch "$PLUGIN_REF" --depth 1 https://github.com/Open-Agriculture/AgIsoDevelopmentTools.git
-        cd AgIsoDevelopmentTools
-        git checkout "$PLUGIN_REF"
-        cd clang-tidy-std-prefix
+        cd "$GITHUB_ACTION_PATH/clang-tidy-std-prefix"
         cmake -B build
         cmake --build build
 
     - name: Install plugin to host
       shell: bash
       run: |
-        sudo cp clang-tidy-std-prefix/build/libclangTidyStdPrefixPlugin.so /usr/local/lib/
+        sudo cp \
+          "$GITHUB_ACTION_PATH/clang-tidy-std-prefix/build/libclangTidyStdPrefixPlugin.so" \
+          /usr/local/lib/
